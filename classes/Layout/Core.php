@@ -83,11 +83,12 @@ class Layout_Core
         
         if (!empty($view) && is_object($view) && method_exists($view, 'set_filename'))
         {
-            $view->set_filename($path);
+            $view->set_filename($path)->_id = $path;
         }
         else
         {
             $view = View::factory($path);
+            $view->_id = $path;
         }
     }
     
