@@ -14,7 +14,12 @@ class Layout_Controller extends Controller
      * @var  boolean  auto render template
      */
     public $auto_render = TRUE;
-
+    
+    /**
+     * @var  mixed  renders an action as an ajax template
+     */
+    public $ajax_render = null;
+    
     /**
      * Path of the contents container folder relative to the view folder.
      */
@@ -24,6 +29,11 @@ class Layout_Controller extends Controller
      * template template file
      */
     public $template = 'template/:device/default';
+
+    /**
+     * Path of the contents container folder relative to the view folder.
+     */
+    public $subfolder = null;
 
     /**
      * header template file
@@ -52,17 +62,24 @@ class Layout_Controller extends Controller
         {
             return true;
         }
-
+        
         $controller = str_replace('_', '/', strtolower($this->request->controller()));
         $action = strtolower($this->request->action());
-
-        $body = $this->content_path . DIRECTORY_SEPARATOR
-            . $controller . DIRECTORY_SEPARATOR . $action;
-
+        
+        $body = $this->content_path . DIRECTORY_SEPARATOR . $controller
+            . (!empty($this->subfolder) ? DIRECTORY_SEPARATOR . $this->subfolder: '') . DIRECTORY_SEPARATOR . $action;
+        
         // Create content layout depending on the controller and action.
+        
+        //Render the layout as ajax.
+        if (!empty($this->ajax_render) && in_array($action, $this->ajax_render))
+        {
+            return $this->layout = new View(Layout_Parser::evaluate($body));
+        }
+        
         $this->layout = Layout::factory($this->template, $body);
-
-        // the following can also be manually called in the action method.
+        
+        // the following can also be manually called in the action method. Layout_Parser is already done by set_header and set_footer
         if (!empty($this->header))
         {
             $this->layout->set_header($this->header);
