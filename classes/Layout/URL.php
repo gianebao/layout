@@ -22,6 +22,6 @@ class Layout_URL extends Kohana_URL {
             $params = array('id' => $params);
         }
         
-        return Route::site(Route::get($route_name)->uri($params));
+        return URL::site(Route::get($route_name)->uri($params));
     }
 }
