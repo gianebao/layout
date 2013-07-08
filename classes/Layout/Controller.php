@@ -16,11 +16,6 @@ class Layout_Controller extends Controller
     public $auto_render = TRUE;
     
     /**
-     * @var  mixed  renders an action as an ajax template
-     */
-    public $ajax_render = null;
-    
-    /**
      * Path of the contents container folder relative to the view folder.
      */
     public $content_path = 'content';
@@ -72,7 +67,7 @@ class Layout_Controller extends Controller
         // Create content layout depending on the controller and action.
         
         //Render the layout as ajax.
-        if (!empty($this->ajax_render) && in_array($action, $this->ajax_render))
+        if ($this->request->is_ajax())
         {
             return $this->layout = new View(Layout_Parser::evaluate($body));
         }
