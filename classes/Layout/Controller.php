@@ -14,7 +14,7 @@ class Layout_Controller extends Controller
      * @var  boolean  auto render template
      */
     public $auto_render = TRUE;
-    
+
     /**
      * Path of the contents container folder relative to the view folder.
      */
@@ -52,28 +52,34 @@ class Layout_Controller extends Controller
     {
         parent::before();
 
+        // If the request is ajax, force to disable autorender
+        if ($this->request->is_ajax())
+        {
+            $this->auto_render = false;
+        }
+
         // Just in case the whole controller does not need rendiring.
-        if ($this->auto_render !== TRUE)
+        if ($this->auto_render !== true)
         {
             return true;
         }
-        
+
         $controller = str_replace('_', '/', strtolower($this->request->controller()));
         $action = strtolower($this->request->action());
-        
+
         $body = $this->content_path . DIRECTORY_SEPARATOR . $controller
             . (!empty($this->subfolder) ? DIRECTORY_SEPARATOR . $this->subfolder: '') . DIRECTORY_SEPARATOR . $action;
-        
+
         // Create content layout depending on the controller and action.
-        
+
         //Render the layout as ajax.
         if ($this->request->is_ajax())
         {
             return $this->layout = new View(Layout_Parser::evaluate($body));
         }
-        
+
         $this->layout = Layout::factory($this->template, $body);
-        
+
         // the following can also be manually called in the action method. Layout_Parser is already done by set_header and set_footer
         if (!empty($this->header))
         {
