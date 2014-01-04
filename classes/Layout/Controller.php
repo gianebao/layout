@@ -46,6 +46,11 @@ class Layout_Controller extends Controller
     public $layout = null;
 
     /**
+     * manual mapping of view files to actions.
+     */
+    public $_view_mapping = array();
+
+    /**
      * Loads the template [View] object.
      */
     public function before()
@@ -67,8 +72,25 @@ class Layout_Controller extends Controller
         $controller = str_replace('_', '/', strtolower($this->request->controller()));
         $action = strtolower($this->request->action());
 
-        $body = $this->content_path . DIRECTORY_SEPARATOR . $controller
-            . (!empty($this->subfolder) ? DIRECTORY_SEPARATOR . $this->subfolder: '') . DIRECTORY_SEPARATOR . $action;
+        // Check if manual mapping is declared.
+        if (empty($this->_view_mapping) || empty($this->_view_mapping[$action]))
+        {
+            $body = $this->content_path . DIRECTORY_SEPARATOR . $controller
+            . (!empty($this->subfolder) ? DIRECTORY_SEPARATOR . $this->subfolder: '')
+            . DIRECTORY_SEPARATOR . $action;
+        }
+        else
+        {
+            $body = strtr(
+                $this->_view_mapping[$action],
+                array(
+                    ':content' => $this->content_path,
+                    ':controller' => $controller,
+                    ':subfolder' => $this->subfolder,
+                    ':action' => $action
+                )
+            );
+        }
 
         // Create content layout depending on the controller and action.
 
